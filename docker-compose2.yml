@@ -1,0 +1,54 @@
+version: '3.8'  # Ensure you specify the Compose file version
+
+networks:
+  app_network:
+    driver: bridge
+
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./:/var/www/app
+      - ./nginx/conf.d:/etc/nginx/conf.d/
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    depends_on:
+      - todo-app
+    networks:
+      - app_network
+    command: >
+      /bin/sh -c "while :; do
+        sleep 6h & wait $${!};
+        nginx -s reload;
+      done & nginx -g 'daemon off;'"
+
+  todo-app:
+    build:
+      context: .  # Ensure this path is correct
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "8000:8000"
+    networks:
+      - app_network
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    depends_on:
+      - nginx
+    command: certonly --webroot --webroot-path=/var/www/certbot --force-renewal --email iamasiwome1@gmail.com --agree-tos --no-eff-email --staging -d todo.auroraverusschool.org -d www.todo.auroraverusschool.org
+
+volumes:
+  certbot-etc:
+  certbot-var:
