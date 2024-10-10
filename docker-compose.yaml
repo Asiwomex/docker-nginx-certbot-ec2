@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile-uat
+    env_file:
+      - .env
+    environment:
+      - DB_ENGINE=${DB_ENGINE}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+  db:
+    image: postgres
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data-new:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  nginx:
+    image: jonasal/nginx-certbot:latest
+    restart: unless-stopped
+    environment:
+      - CERTBOT_EMAIL=iamasiwome@gmail.com #check email for the certbot
+      - DOMAIN_LIST=api2.devops.reggeerr.com #check domain for the certbot
+    env_file:
+      - ./nginx-certbot.env
+    ports:
+      - 80:80
+      - 443:443
+    volumes:                                    # Storage can be either a
+      - nginx_secrets:/etc/letsencrypt          # Docker managed volume (see list at the bottom)
+      - ./user_conf.d:/etc/nginx/user_conf.d
+#    depends_on:
+#      - web
+volumes:
+  postgres_data-new:
+  nginx_secrets:
