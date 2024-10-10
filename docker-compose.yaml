@@ -37,7 +37,7 @@ services:
       - CERTBOT_EMAIL=iamasiwome@gmail.com #check email for the certbot
       - DOMAIN_LIST=api2.devops.reggeerr.com #check domain for the certbot
     env_file:
-      - ./nginx-certbot.env
+      - ./nginx-certbot.env #check nginx-certbot.env and edit it
     ports:
       - 80:80
       - 443:443
