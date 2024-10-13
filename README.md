@@ -4,7 +4,8 @@ Deploy dockerised version of a todo API on EC2 with SSL setup.
 So everything from the todo api to nginx to say db should all be running docker containers.
 
 ### NOTE
-The nginx image used was "jonasal/nginx-certbot:latest"
+1. The nginx image used was "jonasal/nginx-certbot:latest"
+2. Check this url https://github.com/JonasAlfredsson/docker-nginx-certbot in case of anything
 
 ## You need...
 1. An EC2 instance (Ubuntu) with docker and docker-compose installed
